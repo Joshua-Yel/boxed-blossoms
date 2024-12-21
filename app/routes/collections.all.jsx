@@ -101,7 +101,7 @@ function CollectionItem({collection, loading}) {
                 alt={collection.title}
                 data={image}
                 loading={loading}
-                sizes="(min-width: 45em) 400px, 100vw"
+                // sizes="(min-width: 45em) 400px, 100vw"
                 className="collectionPage-image"
               />
             </div>
