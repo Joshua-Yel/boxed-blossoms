@@ -1,14 +1,13 @@
 import {defer} from '@shopify/remix-oxygen';
 import {useLoaderData, Link} from '@remix-run/react';
-import {getPaginationVariables, Image, Money} from '@shopify/hydrogen';
-import {useVariantUrl} from '~/lib/variants';
+import {getPaginationVariables, Image} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 
 /**
  * @type {MetaFunction<typeof loader>}
  */
 export const meta = () => {
-  return [{title: `Hydrogen | Products`}];
+  return [{title: `Hydrogen | Collections`}];
 };
 
 /**
@@ -35,13 +34,14 @@ async function loadCriticalData({context, request}) {
     pageBy: 8,
   });
 
-  const [{products}] = await Promise.all([
-    storefront.query(CATALOG_QUERY, {
+  // Query collections instead of products
+  const [{collections}] = await Promise.all([
+    storefront.query(COLLECTIONS_QUERY, {
       variables: {...paginationVariables},
     }),
     // Add other queries here, so that they are loaded in parallel
   ]);
-  return {products};
+  return {collections};
 }
 
 /**
@@ -56,19 +56,19 @@ function loadDeferredData({context}) {
 
 export default function Collection() {
   /** @type {LoaderReturnData} */
-  const {products} = useLoaderData();
+  const {collections} = useLoaderData();
 
   return (
     <div className="collection">
-      <h1>Products</h1>
+      <h2 className="collectionPage-title">Collections</h2>
       <PaginatedResourceSection
-        connection={products}
-        resourcesClassName="products-grid"
+        connection={collections}
+        resourcesClassName="collections-grid"
       >
-        {({node: product, index}) => (
-          <ProductItem
-            key={product.id}
-            product={product}
+        {({node: collection, index}) => (
+          <CollectionItem
+            key={collection.id}
+            collection={collection}
             loading={index < 8 ? 'eager' : undefined}
           />
         )}
@@ -79,75 +79,43 @@ export default function Collection() {
 
 /**
  * @param {{
- *   product: ProductItemFragment;
+ *   collection: CollectionItemFragment;
  *   loading?: 'eager' | 'lazy';
  * }}
  */
-function ProductItem({product, loading}) {
-  const variant = product.variants.nodes[0];
-  const variantUrl = useVariantUrl(product.handle, variant.selectedOptions);
+function CollectionItem({collection, loading}) {
+  const image = collection?.image; // Assuming 'image' is part of the collection object
+
   return (
-    <Link
-      className="product-item"
-      key={product.id}
-      prefetch="intent"
-      to={variantUrl}
-    >
-      {product.featuredImage && (
-        <Image
-          alt={product.featuredImage.altText || product.title}
-          aspectRatio="1/1"
-          data={product.featuredImage}
-          loading={loading}
-          sizes="(min-width: 45em) 400px, 100vw"
-        />
-      )}
-      <h4>{product.title}</h4>
-      <small>
-        <Money data={product.priceRange.minVariantPrice} />
-      </small>
-    </Link>
+  <div className="collection-container">
+    <div className="collection-card">
+        <Link
+          className="collection-item"
+          key={collection.id}
+          prefetch="intent"
+          to={`/collections/${collection.handle}`} // Link to collection detail page
+        >
+          {image && (
+            <div className="collection-image">
+              <Image
+                alt={collection.title}
+                data={image}
+                loading={loading}
+                sizes="(min-width: 45em) 400px, 100vw"
+                className="collectionPage-image"
+              />
+            </div>
+          )}
+          <h4 className="collectionPage-name">{collection.title}</h4>
+        </Link>
+      </div>
+  </div>
   );
 }
 
-const PRODUCT_ITEM_FRAGMENT = `#graphql
-  fragment MoneyProductItem on MoneyV2 {
-    amount
-    currencyCode
-  }
-  fragment ProductItem on Product {
-    id
-    handle
-    title
-    featuredImage {
-      id
-      altText
-      url
-      width
-      height
-    }
-    priceRange {
-      minVariantPrice {
-        ...MoneyProductItem
-      }
-      maxVariantPrice {
-        ...MoneyProductItem
-      }
-    }
-    variants(first: 1) {
-      nodes {
-        selectedOptions {
-          name
-          value
-        }
-      }
-    }
-  }
-`;
-
-// NOTE: https://shopify.dev/docs/api/storefront/2024-01/objects/product
-const CATALOG_QUERY = `#graphql
-  query Catalog(
+// Updated GraphQL query to fetch collections (without featuredImage)
+const COLLECTIONS_QUERY = `#graphql
+  query Collections(
     $country: CountryCode
     $language: LanguageCode
     $first: Int
@@ -155,9 +123,18 @@ const CATALOG_QUERY = `#graphql
     $startCursor: String
     $endCursor: String
   ) @inContext(country: $country, language: $language) {
-    products(first: $first, last: $last, before: $startCursor, after: $endCursor) {
+    collections(first: $first, last: $last, before: $startCursor, after: $endCursor) {
       nodes {
-        ...ProductItem
+        id
+        handle
+        title
+        image {
+          id
+          altText
+          url
+          width
+          height
+        }
       }
       pageInfo {
         hasPreviousPage
@@ -167,10 +144,4 @@ const CATALOG_QUERY = `#graphql
       }
     }
   }
-  ${PRODUCT_ITEM_FRAGMENT}
 `;
-
-/** @typedef {import('@shopify/remix-oxygen').LoaderFunctionArgs} LoaderFunctionArgs */
-/** @template T @typedef {import('@remix-run/react').MetaFunction<T>} MetaFunction */
-/** @typedef {import('storefrontapi.generated').ProductItemFragment} ProductItemFragment */
-/** @typedef {import('@shopify/remix-oxygen').SerializeFrom<typeof loader>} LoaderReturnData */

@@ -15,8 +15,174 @@ img {
 /*
 * --------------------------------------------------
 * components/Aside
+
+
+/* Collection Container Styles */
+.collection-container {
+  margin-left: 15%;
+  margin-right: 15%;
+  margin-bottom: 5%;
+}
+
+.collectionPage-title {
+  font-family: "Gemola";
+  font-size: 4rem;
+  font-weight: bold;
+  margin-bottom: 30px;
+  margin-top: 5%;
+  text-align: center;
+  text-transform: uppercase;
+  color: #8b3d39;
+  padding: 10px 0;
+  display: grid;
+  align-items: center;
+}
+
+.collectionPage-title::after {
+  content: "";
+  height: 2px;
+  background-color: #8b3d39;
+  display: block;
+  margin-bottom: 10px;
+  margin-top: 1%;
+  margin-left: 16%;
+  margin-right: 16%;
+}
+
+/* Collection List Styles */
+.collection-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 50px;
+  padding: 20px;
+}
+
+.collection-card {
+  position: relative;
+  border-radius: 0px;
+  overflow: hidden;
+  text-align: center;
+  transition: opacity 0.5s all 0.5s ease;
+  background: #f8e9ec;
+}
+
+.collectionPage-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.1;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  background: linear-gradient(45deg, #590d22, #ff4d6d);
+}
+
+.collectionPage-name {
+  font-family: "Gemola";
+  font-size: 2rem;
+  font-weight: 1000;
+  color: #8b3d39;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  transition: all 0.5s ease;
+}
+
+.collection-card:hover .collectionPage-image {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.collection-card:hover .collectionPage-name {
+  top: 90%;
+  transform: translate(-50%, 0);
+  font-size: 1.2rem;
+  color: #8b3d39;
+}
+
+/* Media Query for Smaller Screens */
+@media (max-width: 768px) {
+  .collection-list {
+    grid-template-columns: 1fr; /* Stack items on smaller screens */
+  }
+}
+
+/* Filter Bar Styles */
+.filter-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding: 10px 20px;
+  background-color: #fff;
+  border: 0px solid #8b3d39;
+  border-radius: 5px;
+}
+
+.filter-bar input {
+  width: 60%;
+  padding: 8px 12px;
+  border: 2px solid #8b3d39;
+  border-radius: 4px;
+  font-family: "Montserrat", sans-serif;
+  font-size: 1rem;
+  color: #8b3d39;
+}
+
+.filter-bar input::placeholder {
+  color: #d1a5a2;
+}
+
+.filter-bar select {
+  padding: 8px 12px;
+  border: 2px solid #8b3d39;
+  border-radius: 4px;
+  font-family: "Montserrat", sans-serif;
+  font-size: 1rem;
+  color: #8b3d39;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.filter-bar select option {
+  font-family: "Montserrat", sans-serif;
+  font-size: 1rem;
+  color: #8b3d39;
+  background-color: #fff;
+}
+
+.filter-bar input:focus,
+.filter-bar select:focus {
+  outline: none;
+  border-color: #8b3d39;
+  box-shadow: 0 0 5px rgba(139, 61, 57, 0.4);
+}
+
+@media (max-width: 768px) {
+  .filter-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .filter-bar input,
+  .filter-bar select {
+    width: 100%;
+  }
+}
+
+
+
 * --------------------------------------------------
 */
+
+
+/* 
+list
+ */
+
+
+ /*  */
 aside {
   background: var(--color-light);
   box-shadow: 0 0 50px rgba(0, 0, 0, 0.3);
@@ -362,10 +528,14 @@ button.reset:hover:not(:has(> *)) {
 * --------------------------------------------------
 */
 .collections-grid {
-  display: grid;
+  /* display: grid;
   grid-gap: 1.5rem;
   grid-template-columns: repeat(auto-fit, minmax(var(--grid-item-width), 1fr));
-  margin-bottom: 2rem;
+  margin-bottom: 2rem; */
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 50px;
+  padding: 20px;
 }
 
 .collection-item img {
